@@ -2,72 +2,101 @@
 //  FirstViewController.swift
 //  Translator
 //
-//  Created by Catherine Goode on 10/11/19.
 //  Copyright © 2019 Felix. All rights reserved.
 //
 
 import UIKit
 import AVFoundation
 
-class FirstViewController: UIViewController, UINavigationControllerDelegate{
-    
-    
-    
-    
-    
-    
-    
-    let captureSession = AVCaptureSession()
-    let previewLayer = AVCaptureVideoPreviewLayer()
-    var photoOutput = AVCapturePhotoOutput()
-    
-    override func viewDidLoad() {
-          super.viewDidLoad()
-        
-        let captureSession = AVCaptureSession()
-        
-        captureSession.beginConfiguration()
-        let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera,
-                                                  for: .video, position: .unspecified)
-        
-        //NOTE: AVFoundation camera functions cannot work on simulator. Testing must use an iphone
-        guard
-            let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice!),
-            captureSession.canAddInput(videoDeviceInput)
-            else { return }
-        captureSession.addInput(videoDeviceInput)
-        
-        
-            
-        let photoOutput = AVCapturePhotoOutput()
-        guard captureSession.canAddOutput(photoOutput) else { return }
-        captureSession.sessionPreset = .photo
-        captureSession.addOutput(photoOutput)
-        captureSession.commitConfiguration()
-        
-        self.previewView.videoPreviewLayer.session = self.captureSession
-        
-        self.captureSession.startRunning()
-        
-        
 
+    class FirstViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        
+        @IBOutlet weak var ImageVieww: UIImageView!
+        
+        @IBAction func ImportImage(_ sender: Any) {
+            
+            let image = UIImagePickerController()
+            image.delegate = self
+            
+            image.sourceType = UIImagePickerController.SourceType.camera
+            
+            image.allowsEditing = false
+            
+            self.present(image, animated: true){
+                
+            }
+            
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            
+            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+            {
+                ImageVieww.image = image
+                return sendToCloud(img: image)
+            }
+            else{
+                //error message
+            }
         }
     
     
-    @IBAction func takePic(_ Sender: Any) {
-          
-          
-          let photoSettings = AVCapturePhotoSettings()
-        
-        photoOutput.capturePhoto(with: photoSettings, delegate: self)
-          
-        self.captureSession.stopRunning()
-          
-      }
-      
-      @IBOutlet weak var previewView: PreviewView!
     
-    @IBOutlet weak var ImageVieww: UIImageView!
+    
+//
+//
+//    let captureSession = AVCaptureSession()
+//    let previewLayer = AVCaptureVideoPreviewLayer()
+//    var photoOutput = AVCapturePhotoOutput()
+//
+    override func viewDidLoad() {
+          super.viewDidLoad()
+        }
+        
+//        let captureSession = AVCaptureSession()
+//
+//        captureSession.beginConfiguration()
+//        let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera,
+//                                                  for: .video, position: .unspecified)
+//
+//        //NOTE: AVFoundation camera functions cannot work on simulator. Testing must use an iphone
+//        guard
+//            let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice!),
+//            captureSession.canAddInput(videoDeviceInput)
+//            else { return }
+//        captureSession.addInput(videoDeviceInput)
+//
+//
+//
+//        let photoOutput = AVCapturePhotoOutput()
+//        guard captureSession.canAddOutput(photoOutput) else { return }
+//        captureSession.sessionPreset = .photo
+//        captureSession.addOutput(photoOutput)
+//        captureSession.commitConfiguration()
+//
+//        self.previewView.videoPreviewLayer.session = self.captureSession
+//
+//        self.captureSession.startRunning()
+//
+//
+//
+//        }
+//
+//
+//    @IBAction func takePic(_ Sender: Any) {
+//
+//
+//          let photoSettings = AVCapturePhotoSettings()
+//
+//        photoOutput.capturePhoto(with: photoSettings, delegate: self)
+//
+//        self.captureSession.stopRunning()
+//
+//      }
+//
+//      @IBOutlet weak var previewView: PreviewView!
+//
+//    @IBOutlet weak var ImageVieww: UIImageView!
     
     
     
@@ -211,19 +240,19 @@ func translate(objectName: String){
     @IBOutlet weak var TranslatedText: UILabel!
 }
 
-extension FirstViewController : AVCapturePhotoCaptureDelegate {
-   func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-    let imageData = photo.fileDataRepresentation()
-        if let data = imageData, let img = UIImage(data: data) {
-            sendToCloud(img: img)
-            ImageVieww.image = img
-            ImageVieww.isHidden = false
+//extension FirstViewController : AVCapturePhotoCaptureDelegate {
+//   func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+//    let imageData = photo.fileDataRepresentation()
+//        if let data = imageData, let img = UIImage(data: data) {
+//            sendToCloud(img: img)
+//            ImageVieww.image = img
+//            ImageVieww.isHidden = false
+        
             
             
-            
-        }
-    }
-    }
+
+
+
 
 
 

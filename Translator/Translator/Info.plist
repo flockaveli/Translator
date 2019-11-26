@@ -44,11 +44,11 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Hey</string>
+	<string>Allow</string>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Mine now</string>
+	<string>Allow</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Mine now</string>
+	<string>Allow</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
