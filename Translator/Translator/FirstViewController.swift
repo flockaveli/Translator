@@ -11,47 +11,36 @@ import AVFoundation
 
     class FirstViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
         
-        @IBOutlet weak var ImageVieww: UIImageView!
+        @IBOutlet weak var ImageView: UIImageView!
+        @IBOutlet weak var ObjectNameText: UILabel!
+        @IBOutlet weak var TranslatedText: UILabel!
         
-        @IBAction func ImportImage(_ sender: Any) {
-            
-            let image = UIImagePickerController()
-            image.delegate = self
-            
-            image.sourceType = UIImagePickerController.SourceType.camera
-            
-            image.allowsEditing = false
-            
-            self.present(image, animated: true){
-                
-            }
-            
+        @IBAction func ImportImage(_ sender: UIButton) {
+            self.imagePicker.present(from: sender)
         }
         
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        var imagePicker: ImagePicker!
+
+            override func viewDidLoad() {
+                super.viewDidLoad()
+
+                self.imagePicker = ImagePicker(presentationController: self, delegate: self)
+            }
             
-            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-            {
-                ImageVieww.image = image
-                return sendToCloud(img: image)
+            @IBAction func showImagePicker(_ sender: UIButton) {
             }
-            else{
-                //error message
-            }
-        }
-    
-    
-    
-    
+        
+
+
+
+
+        
 //
 //
 //    let captureSession = AVCaptureSession()
 //    let previewLayer = AVCaptureVideoPreviewLayer()
 //    var photoOutput = AVCapturePhotoOutput()
 //
-    override func viewDidLoad() {
-          super.viewDidLoad()
-        }
         
 //        let captureSession = AVCaptureSession()
 //
@@ -100,15 +89,14 @@ import AVFoundation
     
     
     
-
 func sendToCloud(img: UIImage)
 {
     let azure = URL(string: "https://australiaeast.api.cognitive.microsoft.com/vision/v2.1/detect")!
-    if let sendImage = img.pngData(){
+    if let sendImage = img.jpegData(compressionQuality: 1.0){
         var request = URLRequest(url: azure)
     request.httpMethod = "POST"
-    request.httpBody = try? JSONSerialization.data(withJSONObject: sendImage, options: [])
-    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.httpBody = sendImage
+    request.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
     request.addValue("australiaeast.api.cognitive.microsoft.com", forHTTPHeaderField: "Host")
     request.addValue("604cce289ecc46da92e23e4def42d5f4", forHTTPHeaderField: "Ocp-Apim-Subscription-Key")
     let APIsession = URLSession.shared
@@ -120,34 +108,72 @@ func sendToCloud(img: UIImage)
         print(error!)
         return
       }
+        
       // make sure we got data
       guard let responseData = data else {
         print("Error: did not receive data")
         return
       }
-      // parse the result as JSON, since that's what the API provides
-      do {
-        guard let objectFound = try JSONSerialization.jsonObject(with: responseData, options: [])
-          as? [String: Any] else {
-          print("error trying to convert data to JSON")
-          return
+        guard let responseString = String(data: data!, encoding: .utf8) else {
+            print("Error getting string")
+            return
         }
-       
-        print("The object is: " + objectFound.description)
         
-        guard let objectTitle = objectFound["object"] as? String else {
-          print("Could not get object title from JSON")
-          return
+        guard let objectsResponse = try? JSONSerialization.jsonObject(with: responseData, options: []) else {
+            print("could not extract json")
+            return
         }
-        translate(objectName: objectTitle)
-        DispatchQueue.main.async {
-            self.ObjectNameText.text = objectTitle
+        
+      do {
+        
+        print("responseString = \(String(describing: responseString))")
+        guard let dictionary = objectsResponse as? [String: Any] else {
+        print("error at json")
+            return}
+
+            guard let nestedObjects = dictionary["objects"] as? [Any] else {
+                print("error at top")
+                return}
+                guard let foundObject = nestedObjects.first else {
+                print("error at array")
+                    return}
+                    guard let objectDetails = foundObject as? [String: Any] else {
+                    print("error at objects")
+                        return}
+        guard let objectname = objectDetails["object"] as? String else {
+        print("error at name")
+            return}
+            do {
+                            print(objectname)
+                            translate(objectName: objectname)
+                            DispatchQueue.main.async {
+                                self.ObjectNameText.text = objectname
+                                return
+                            }
+                }
+            }
+        
+        
+        
+//
+//
+////        print("The object is: " + objectFound.description)
+////
+////        guard let objectTitle = objectFound["object"] as? String else {
+////          print("Could not get object title from JSON")
+////          return
+//        }
+//        translate(objectName: objectTitle)
+//        DispatchQueue.main.async {
+//            self.ObjectNameText.text = objectTitle
+//        }
+      
+//      catch  {
+//        print("error trying to convert data to JSON")
+//        return
+//      }
         }
-      } catch  {
-        print("error trying to convert data to JSON")
-        return
-      }
-        }
+        
     
     
     task.resume()
@@ -165,40 +191,49 @@ func translate(objectName: String){
          let azureKey = "3d4ca283af2148b485cfbad0f812f453"
          
          let contentType = "application/json"
-         let host = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0"
-         let apiURL = "https://dev.microsofttranslator.com/translate?api-version=3.0&from=en&to=ko"
-         
+         let apiURL = "https://api-apc.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=ko"
+
     struct encodeText: Codable {
         var text = String()
     }
-     
          let text2Translate = objectName
          var encodeTextSingle = encodeText()
          var toTranslate = [encodeText]()
-           
+       let jsonEncoder = JSONEncoder()
+
          encodeTextSingle.text = text2Translate
          toTranslate.append(encodeTextSingle)
+     
     
-    
+       guard let jsonToTranslate = try? jsonEncoder.encode(toTranslate) else {
+        print("couldnt convert name to json")
+        return
+    }
 
-         let jsonToTranslate = try? JSONSerialization.data(withJSONObject: toTranslate, options: [])
-                
+         
+
                 
          let url = URL(string: apiURL)
          var request = URLRequest(url: url!)
+//         guard let objectfortranslation: Data = objectName.data(using: .utf8)  else {
+//        print("couldnt convert string to data")
+//        return
+//    }
 
          request.httpMethod = "POST"
          request.addValue(azureKey, forHTTPHeaderField: "Ocp-Apim-Subscription-Key")
+    request.addValue(String(describing: jsonToTranslate.count), forHTTPHeaderField: "Content-Length")
          request.addValue(contentType, forHTTPHeaderField: "Content-Type")
-         request.addValue(host, forHTTPHeaderField: "Host")
-         request.httpBody = jsonToTranslate
+    request.addValue("api-apc.cognitive.microsofttranslator.com", forHTTPHeaderField: "Host")
+    
+       request.httpBody = jsonToTranslate
          
          let config = URLSessionConfiguration.default
          let session =  URLSession(configuration: config)
          
          let task = session.dataTask(with: request) { (data, response, error) in
              
-   if error != nil {
+        if error != nil {
                print("this is the error ", error!)
                
                let alert = UIAlertController(title: "Could not connect to service", message: "Please check your network connection and try again", preferredStyle: .actionSheet)
@@ -208,36 +243,64 @@ func translate(objectName: String){
                self.present(alert, animated: true)
                
            }
+            
+            guard let responseData = data else {
+              print("Error: did not receive data")
+              return
+            }
+              guard let responseString = String(data: data!, encoding: .utf8) else {
+                  print("Error getting string")
+                  return
+              }
+              print(data, response, error)
+            print("responseString = \(String(describing: responseString))")
+              guard let translationResponse = try? JSONSerialization.jsonObject(with: responseData, options: []) else {
+                  
+                  print("could not extract translation json")
+                  return
+              }
+              
+            do {
+             
+
+                  guard let nestedTranslations = translationResponse as? [Any] else {
+                      print("error at top")
+                      return}
+                      guard let foundObject = nestedTranslations.first as? [String: Any] else {
+                      print("error at array")
+                          return}
+                          guard let translationDetails = foundObject["translations"] as? [Any] else {
+                          print("error at translation")
+                              return}
+                guard let nameinko = translationDetails.first as? [String: Any] else {
+                print("error at array")
+                    return}
+              guard let translatedname = nameinko["text"] as? String else {
+              print("error at name")
+                  return}
            print("*****")
-           self.parseJson(jsonData: data!)
+            DispatchQueue.main.async {
+                
+            
+           self.TranslatedText.text = translatedname
+            }
+    }
     }
        task.resume()
    }
     }
     
-    func parseJson(jsonData: Data) {
-    
-    //*****TRANSLATION RETURNED DATA*****
-    struct ReturnedJson: Codable {
-        var translations: [TranslatedStrings]
-    }
-    struct TranslatedStrings: Codable {
-        var text: String
-        var to: String
-    }
-    
-    let jsonDecoder = JSONDecoder()
-    let langTranslations = try? jsonDecoder.decode(Array<ReturnedJson>.self, from: jsonData)
-    let numberOfTranslations = langTranslations!.count - 1
-    print(langTranslations!.count)
-    
-    //Put response on main thread to update UI
-    DispatchQueue.main.async {
-        self.TranslatedText.text = langTranslations![0].translations[numberOfTranslations].text
-    }
+
 }
-    @IBOutlet weak var ObjectNameText: UILabel!
-    @IBOutlet weak var TranslatedText: UILabel!
+
+extension FirstViewController: ImagePickerDelegate {
+
+    func didSelect(image: UIImage?) {
+        DispatchQueue.main.async {
+        self.ImageView.image = image
+        }
+        sendToCloud(img: image!)
+    }
 }
 
 //extension FirstViewController : AVCapturePhotoCaptureDelegate {
@@ -249,7 +312,7 @@ func translate(objectName: String){
 //            ImageVieww.isHidden = false
         
             
-            
+
 
 
 

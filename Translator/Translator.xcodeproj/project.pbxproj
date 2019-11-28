@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0628737D238DEA9A000EC48C /* ImagePickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0628737C238DEA9A000EC48C /* ImagePickerDelegate.swift */; };
 		06EDB6C0237772180062FFBE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06EDB6BF237772180062FFBE /* AppDelegate.swift */; };
 		06EDB6C2237772180062FFBE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06EDB6C1237772180062FFBE /* SceneDelegate.swift */; };
 		06EDB6C4237772180062FFBE /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06EDB6C3237772180062FFBE /* FirstViewController.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0628737C238DEA9A000EC48C /* ImagePickerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerDelegate.swift; sourceTree = "<group>"; };
 		06EDB6BC237772180062FFBE /* Translator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Translator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		06EDB6BF237772180062FFBE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		06EDB6C1237772180062FFBE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				06EDB6CC2377721A0062FFBE /* LaunchScreen.storyboard */,
 				06EDB6CF2377721A0062FFBE /* Info.plist */,
 				06EDB6D52378F54A0062FFBE /* PreviewView.swift */,
+				0628737C238DEA9A000EC48C /* ImagePickerDelegate.swift */,
 			);
 			path = Translator;
 			sourceTree = "<group>";
@@ -105,6 +108,7 @@
 				TargetAttributes = {
 					06EDB6BB237772180062FFBE = {
 						CreatedOnToolsVersion = 11.0;
+						LastSwiftMigration = 1100;
 					};
 				};
 			};
@@ -144,6 +148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0628737D238DEA9A000EC48C /* ImagePickerDelegate.swift in Sources */,
 				06EDB6D62378F54A0062FFBE /* PreviewView.swift in Sources */,
 				06EDB6C6237772180062FFBE /* SecondViewController.swift in Sources */,
 				06EDB6C4237772180062FFBE /* FirstViewController.swift in Sources */,
@@ -303,7 +308,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = unitec.Translator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = NO;
 			};
@@ -324,7 +329,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = unitec.Translator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = NO;
 			};
